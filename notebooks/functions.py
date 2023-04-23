@@ -1,7 +1,6 @@
 """Модуль муравьиного алгоритма
 """
 
-from typing import Optional
 from random import random
 import pandas as pd
 
@@ -41,9 +40,10 @@ def find_new_vertex(visited, unvisited, attract):
 
 
 def count_route_distance(dist, visited, available):
-    route_dist = sum([dist[visited[i], visited[i + 1]]
-                      for i in range(available)])
-    return route_dist
+    distance = 0
+    for i in range(available):
+        distance += dist[visited[i], visited[i + 1]]
+    return distance
 
 
 def find_path(dist, start, end, ants=1, ages=1, rho=0.1, a=1, b=1,
@@ -103,4 +103,18 @@ def find_path(dist, start, end, ants=1, ages=1, rho=0.1, a=1, b=1,
                         unvisited.remove(item)
                 attract = count_attraction(visited, unvisited, ph, rev_dist, a)
                 visited = find_new_vertex(visited, unvisited, attract)
+                route_dist = count_route_distance(dist, visited, available)
+                rel_q = q / route_dist
+                for i in range(available):
+                    ph[visited[i], visited[i + 1]] += rel_q
+
+                if route_dist < best_dist:
+                    best_route, best_dist = visited, route_dist
+
+            size = len(best_route) - 1
+            rel_q = q / best_dist * elite
+            for i in range(size):
+                ph[best_route[i], best_route[i + 1]] += rel_q
+
+            ph = np.clip(ph * (1 - rho), ph_min, ph_max)
     return best_route, best_dist
