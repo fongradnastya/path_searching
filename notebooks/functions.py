@@ -160,8 +160,8 @@ def aco(dist: np.ndarray, start: int, end: int, *, ants: int=1,
 
     vertexes = set(range(num)) - {end} | {start}
     available = len(vertexes)
-    for _ in range(ages):
-
+    for i in range(ages):
+        print(f"{i} age")
         for _ in range(ants):
 
             visited = (start,)
